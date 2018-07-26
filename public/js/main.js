@@ -4,30 +4,41 @@ var goalSize = {
     y: 150
 };
 var score = '0 - 0';
-
 var socket = io.connect();
 var users = [];
 var user;
 var ballLoc;
 var name = 'Unnamed';
-var speed = 3;
+var speed = 5;
 var userR = 20;
 var ballR = 12;
 
 var pink = '#C80064'; //200, 0, 100;
 var teal = '#74C2E1'; //116, 194, 225;
-
-document.getElementById('btn').addEventListener('click', function(){
-    let newName = document.getElementById('name').value;
-    if(newName){
-        user.name = newName;
-        document.getElementById('popup').style.display = 'none';
-        socket.emit('setName', newName);
-        loop();
-    }
+if (screen.width <= 699) {
+    document.location = "controller";
+}
+function gameScreen(teams, size){
+    socket.emit('Screen Ready', {teams: teams, size: size});
+}
+function configurations(teams){
+    $('.team-box.left .team-name').html(teams[0]);
+    $('.team-box.right .team-name').html(teams[1]);
+    $('.popup-container').hide();
+}
+$(document).ready(function($) {
+    socket.on('Player Ready', (player) => {
+        
+    });
+    $('.popup-send-button').on('click', function(event) {
+        event.preventDefault();
+        /* Act on the event */
+        let teams = [$('#team-1').val(), $('#team-2').val()];
+        let size = {width: windowWidth, height: Math.round((windowHeight * 0.8) - 30)}
+        gameScreen(teams, size);
+        configurations(teams);
+    });
 });
-
-
 function preload() {
     socket.on('connectNewUser', function(newUser){
         user = newUser;
@@ -46,7 +57,7 @@ function preload() {
 }
 
 function setup() {
-    createCanvas(800, 600);
+    createCanvas(windowWidth, windowHeight);
     console.log(user);
     
     // Only start looping when you have the initial data from the server

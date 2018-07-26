@@ -6,28 +6,83 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="popup-container" id="popup">
-        <div class="popup">
-            <h1>Welcome to xBall</h1>
-            <h4>- the multiplayer version -</h4>
-            <h3>Objective?</h3>
-            <p>Click the play button and you'll see! :D</p>
-
-            <h3>How to play?</h3>
-            <p>Move with <span class="pink">LEFT, DOWN, RIGHT, UP</span> keys and kick the ball with the <span class="pink">space</span> key.</p>
-            <p>To kick the ball, press the special kick button when you are near it.</p>
-            <p>First to 5! Then the game is reset.</p>
-            <br />
-            <p>Enter your name bellow and Have fun!</p>
-            <input type="text" id="name" placeholder="Name" autocomplete="off">
-            <input type="button" id="btn" value="Play">
-            
-            <small>No one online to play with? Ask a friend to join you!</small>
+    <div class="popup-container">
+        <div class="popup-settings" id="settings">
+            <h1 class="popup-title">Topos League</h1>
+            <h2 class="popup-instructions">Escribe los nombres de los equipos</h2>
+            <div class="popup-teams-box">
+                <div class="popup-team-box" id="Team-1">
+                    <h3 class="popup-team-title">Equipo 1</h3>
+                    <div class="popup-input-box">
+                        <input id="team-1" type="text" name="team-name" value="" placeholder="Niupi" class="popup-team-input">
+                    </div>
+                </div>
+                <div class="popup-team-box" id="Team-2">
+                    <h3 class="popup-team-title">Equipo 2</h3>
+                    <div class="popup-input-box">
+                        <input id="team-2" type="text" name="team-name" value="" placeholder="Warby Parker" class="popup-team-input">
+                    </div>
+                </div>
+            </div>
+            <div class="popup-send-box">
+                <div class="popup-send-button">
+                    <p class="popup-send-text">Buscar jugadores</p>
+                </div>
+            </div>
         </div>
     </div>
     
-    <footer>Built with <span>♥</span> by <a href="http://florin-pop.com">Florin Pop</a></footer>
-    
+    <footer>
+        <div class="start-button">
+            <p class="start-button-text">¡Jugar!</p>
+        </div>
+        <div class="game-box">
+            <div class="team-box left">
+                <h1 class="team-name">Equipo 1</h1>
+                <div class="players-box">
+                    <div class="player-info-box empty">
+                        <img src="imgs/logo_dot.svg" alt="" class="player-image">
+                        <p class="player-name">Esperando...</p>
+                    </div>
+                    <div class="player-info-box empty">
+                        <img src="imgs/logo_dot.svg" alt="" class="player-image">
+                        <p class="player-name">Esperando...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="game-info-box">
+                <div class="score-box">
+                    <p class="score-team one">0</p>
+                    <div class="score-filler"></div>
+                    <p class="score-team two">0</p>
+                </div>
+                <div class="time-box">
+                    <p class="minutes">03</p>
+                    <p class="dots">:</p>
+                    <p class="seconds">00</p>
+                </div>
+                <div class="game-status-box">
+                    <div class="winner-box">
+                        <p class="winner-name">Los niupis</p>
+                    </div>                
+                </div>
+            </div>
+            <div class="team-box right">
+                <h1 class="team-name">Equipo 2</h1>
+                <div class="players-box">
+                    <div class="player-info-box">
+                        <img src="imgs/logo_dot.svg" alt="" class="player-image">
+                        <p class="player-name">Esperando...</p>
+                    </div>
+                    <div class="player-info-box empty">
+                        <img src="imgs/logo_dot.svg" alt="" class="player-image">
+                        <p class="player-name">Esperando...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.6/p5.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.6/addons/p5.dom.min.js"></script>

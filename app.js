@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
@@ -8,16 +9,15 @@ const User = require('./libs/user');
 
 const PORT = process.env.PORT || 3000;
 
-let canvasWidth = 800; // Make sure to be same as on client's
-let canvasHeight = 600; // Make sure to be same as on client's
+let canvasWidth = 100; // Make sure to be same as on client's
+let canvasHeight = 100; // Make sure to be same as on client's
 let fieldOffset = 30; // Make sure to be same as on client's
 let userR = 20; // Make sure to be same as on client's
 let goal = {
     x: fieldOffset,
     y: 150 // Make sure to be same as on client's goalSize
 }
-
-
+let screen;
 let connections = [];
 let users = [];
 let ball = new Ball(canvasWidth, canvasHeight);
@@ -30,7 +30,20 @@ let teams = [{
     count: 0,
     score: 0
 }];
+let teamNames;
+app.use(express.static(__dirname + '/public'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
+app.post('/settings', (req, res) => {
+    console.log(req.params);
+});
+app.get('/', (req, res) => {
+    res.send('index.html');
+});
+app.get('/controller', (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/', 'controller.html'));
+});
 setInterval(tick, 33); // 1000 / x = frames / second
 //setInterval(()=>{console.log(users); console.log();}, 2000);
 function tick() {
@@ -44,26 +57,13 @@ function tick() {
 //    console.log(ball);
 }
 
-
-
-app.use(express.static(__dirname + '/public'));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-app.get('/', (req, res) => {
-    res.send('index.html');
-});
-
 server.listen(PORT, () => {
     console.log("Server listening on port", PORT);
 });
-
+let onSelectPlayers = [];
 io.sockets.on('connection', (socket) => {
     connections.push(socket);
     console.log('Connected: %s sockets connected.', connections.length);
-    
-    socket.emit('connectNewUser', createNewUser(socket.id));
-    
     socket.on('updateUser', (updatedUser) => {
         users.forEach(user => {
             if(user.id === socket.id){
@@ -73,7 +73,29 @@ io.sockets.on('connection', (socket) => {
             }
         })
     });
-    
+    socket.on('Screen Ready', (config) => {
+        console.log('Equipos ', teams);
+        screen = socket.id;
+        teamNames = config.teams;
+        io.emit('Teams', {teams: config.teams});
+    });
+    socket.emits('New Player', {teamNames})
+    socket.on('Player Register', (player) => {
+        console.log('new player: ', player.name);
+        io.to(screen).emit('Player Ready', {name: player.name, image: player.image, id: player.id});
+    });
+    // socket.on('Selected Player', (player)=>{
+    //     if(onSelectPlayers.length > 0){
+    //         for(let name of onSelectPlayers){
+    //             if(name != player.name)
+    //         }
+    //     }
+    //     else{
+    //         onSelectPlayers.push(player.name);
+    //     }
+    //     console.log(player);
+    //     io.emit('Selected Player', {name: player.name, id: player.id});
+    // });
     socket.on('setName', newName => {
         users.forEach(user => {
             if(user.id === socket.id){
