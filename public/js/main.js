@@ -44,7 +44,22 @@ $(document).ready(function($) {
     });
     $('.start-button').on('click', function(e){
       $(this).hide();
-      start();
+      let minutes = 3;
+      let seconds = 0;
+      let timer = setInterval(function(){
+        if(seconds == 0 && minutes > 0){
+        	minutes--;
+          seconds = 59;
+        }
+        else if(seconds > 0){
+        	seconds--;
+        }
+        else if(seconds == 0 && minutes == 0){
+        	clearIntereval(timer);
+        }
+        $('.minutes').html(minutes);
+        $('.seconds').html(seconds);
+      }, 1000);
     });
 });
 setInterval(time, 33)
