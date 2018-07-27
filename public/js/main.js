@@ -26,16 +26,14 @@ function configurations(teams){
     $('.team-box.right .team-name').html(teams[1]);
     $('.popup-container').hide();
 }
+function drawFooter(player){
+    let playerBox = $('.empty[team="' + player.team + '"]');
+    let playerImage = '/imgs/' + player.image;
+    $(playerBox[0]).find('.player-name').html(player.name);
+    $(playerBox[0]).find('.player-image').attr('src', playerImage);
+    $(playerBox[0]).removeClass('empty');
+}
 $(document).ready(function($) {
-    socket.on('Player Ready', (player) => {
-        let playerBox = $('.empty[team="' + player.team + '"]');
-        console.log(playerBox);
-        let playerImage = '/imgs/' + player.image;
-        $(playerBox[0]).find('.player-name').html(player.name);
-        $(playerBox[0]).find('.player-image').attr('src', playerImage);
-        $(playerBox[0]).removeClass('empty');
-        drawUser(player);
-    });
     $('.popup-send-button').on('click', function(event) {
         event.preventDefault();
         /* Act on the event */
@@ -44,21 +42,25 @@ $(document).ready(function($) {
         gameScreen(teams, size);
         configurations(teams);
     });
-});
-function preload() {
-    socket.on('connectNewUser', function(newUser){
-        user = newUser;
-        console.log('User Connected.');
+    $('.start-button').on('click', function(e){
+      $(this).hide();
+      start();
     });
-
+});
+setInterval(time, 33)
+function time(){
+  redraw();
+}
+function preload() {
+    socket.on('Player Ready', (player) => {
+        let _player = player;
+        drawFooter(_player);
+        user = player;
+    });
     socket.on('tick', function(data) {
+        console.log(data);
         users = data.users;
         ballLoc = data.ballLoc;
-    });
-
-    socket.on('scored', function(scores) {
-//        console.log(scores);
-        score = `${scores.pink} - ${scores.teal}`;
     });
 }
 
@@ -72,20 +74,17 @@ function setup() {
 function draw() {
     background('#2980b9');
     drawField();
-    drawScore();
 
     if(user){ // To avoid errors on first drawing
-        moveUser();
+        moveUser(user.direction);
         userBoundaries();
         drawUser(user);
-        socket.emit('updateUser', user);
     }
 
     drawAllUsersExceptThis();
 
     if(ballLoc)
         drawTheBall(ballLoc);
-    loop();
 }
 
 function drawTheBall(_ballLoc) {
@@ -113,7 +112,7 @@ function drawUser(_user){
     //     stroke(255);
     // } else {
     //     stroke(0);
-    // }. 
+    // }.
 
     // strokeWeight(3);
     // ellipse(_user.x, _user.y, userR*2);
@@ -148,17 +147,17 @@ function drawAllUsersExceptThis() {
     });
 }
 
-function moveUser() {
-    if (keyIsDown(LEFT_ARROW))
+function moveUser(direction) {
+    if (direction == 'left')
         user.x -= speed;
 
-    if (keyIsDown(RIGHT_ARROW))
+    if (direction == 'right')
         user.x += speed;
 
-    if (keyIsDown(UP_ARROW))
+    if (direction == 'up')
         user.y -= speed;
 
-    if (keyIsDown(DOWN_ARROW))
+    if (direction == 'down')
         user.y += speed;
 }
 
@@ -206,13 +205,4 @@ function drawField() {
     // Right goal
     fill(teal);
     rect(width - goalSize.x, height/2 - goalSize.y/2, goalSize.x - 3, goalSize.y);
-}
-
-function drawScore() {
-    fill(255);
-    strokeWeight(0);
-    textAlign(LEFT);
-    textSize(16);
-    text('Pink - Teal', 40, 30);
-    text(score, 63, 50);
 }

@@ -17,6 +17,7 @@ let goal = {
     x: fieldOffset,
     y: 150 // Make sure to be same as on client's goalSize
 }
+let speed = 5;
 let screen;
 let connections = [];
 let users = [];
@@ -50,7 +51,7 @@ function tick() {
 //    console.log(users);
 //    console.log('------------------------------');
     io.sockets.emit('tick', {users: users, ballLoc: ball.location});
-    
+
     checkBallCollision(users, ball);
     ballEdges(ball);
     ball.update();
@@ -64,12 +65,24 @@ let onSelectPlayers = [];
 io.sockets.on('connection', (socket) => {
     connections.push(socket);
     console.log('Connected: %s sockets connected.', connections.length);
-    socket.on('updateUser', (updatedUser) => {
+    socket.on('Update User', (updatedUser) => {
         users.forEach(user => {
-            if(user.id === socket.id){
-                user.x = updatedUser.x;
-                user.y = updatedUser.y;
+            console.log(updatedUser)
+            if(user.id === updatedUser.player_id){
+                if (updatedUser.direction == 'left')
+                    user.x -= speed;
+
+                if (updatedUser.direction == 'right')
+                    user.x += speed;
+
+                if (updatedUser.direction == 'up')
+                    user.y -= speed;
+
+                if (updatedUser.direction == 'down')
+                    user.y += speed;
                 user.isKicking = updatedUser.isKicking;
+                user.direction = updatedUser.direction;
+                console.log(user);
             }
         })
     });
@@ -78,14 +91,15 @@ io.sockets.on('connection', (socket) => {
         screen = socket.id;
         teamNames = config.teams;
         io.emit('Teams', {teams: config.teams});
+        canvasWidth = config.size.width;
+        canvasHeighth = config.size.height;
+        ball = new Ball(config.size.width, config.size.height);
+
     });
     socket.emit('New Player', {teamNames})
     socket.on('Player Register', (player) => {
         console.log('new player: ', player.name);
         io.to(screen).emit('Player Ready', createNewUser(player.id, player.name, player.image, player.team));
-    });
-    socket.on('Player Kicking', (player) => {
-        console.log('aaaa', player);
     });
     socket.on('setName', newName => {
         users.forEach(user => {
@@ -104,56 +118,38 @@ io.sockets.on('connection', (socket) => {
 
 function createNewUser(_id, name, image, team) {
     let newUser = {};
-    
+
     newUser.id = _id;
     newUser.team = team;
     newUser.name = name;
     newUser.image = image;
-    
-    if(newUser.team === teams[0].name){ // Pink
+    if(team == 'left'){
         newUser.x = (Math.random() * (canvasWidth / 2 - userR)) + fieldOffset + userR;
-    } else { // Teal
+    }
+    else{
         newUser.x = (Math.random() * (canvasWidth / 2 - fieldOffset - userR)) + (canvasWidth / 2) + userR;
     }
-    
+
     newUser.y = (Math.random() * (canvasHeight - userR / 2)) + userR;
-    
+
     users.push(newUser);
+    io.to(_id).emit('You', newUser);
     return newUser;
 }
 
-function getTeam() {
-    let teamName;
-    
-    // If teal team has more users, add to pink
-    if(teams[1].count > teams[0].count){
-        teamName = teams[0].name;
-        teams[0].count++;
-    } else {
-        teamName = teams[1].name;
-        teams[1].count++;
-    }
-    
-    return teamName;
-}
 
 function scored(team) {
     if(team === teams[0].name)      // purple scorred
         teams[0].score++;
     else if(team === teams[1].name) // teal scorred
         teams[1].score++;
-    
-    if(teams[0].score === 5 || teams[1].score === 5){ // End of one round / Reset score
-        teams[0].score = 0;
-        teams[1].score = 0;
-    }
-    
+
     let scores = {
         pink: teams[0].score,
         teal: teams[1].score
     }
     io.sockets.emit('scored', scores)
-    
+
     ball.stopBall();
     ball.location.x = canvasWidth / 2 ;
     ball.location.y = canvasHeight / 2;
@@ -176,7 +172,7 @@ function setMag(vector, val) {
     vector = normalize(vector);
     vector.x *= val;
     vector.y *= val;
-    
+
     return vector;
 }
 
@@ -185,11 +181,11 @@ function dist(x1, y1, x2, y2) {
 }
 
 function checkBallCollision(users, ball) {
-    
+
     users.forEach(user => {
         let d = dist(user.x, user.y, ball.location.x, ball.location.y);
         let pushForce;
-        
+
         if(d <= userR + ball.r){
             pushForce = {
                 x: ball.location.x - user.x,
@@ -207,7 +203,7 @@ function checkBallCollision(users, ball) {
 }
 
 function ballEdges(ball) {
-    
+
     // Check if outside the goal (y check) right-side
     if(ball.location.x + ball.r > canvasWidth - fieldOffset && ball.location.y < canvasHeight/2 - goal.y/2 || ball.location.x + ball.r > canvasWidth - fieldOffset && ball.location.y > canvasHeight/2 + goal.y/2){
             ball.location.x = canvasWidth - ball.r - fieldOffset;
@@ -216,7 +212,7 @@ function ballEdges(ball) {
     // Check if inside the goal right-side && score team 1 (pink)
     } else if (ball.location.x + ball.r > canvasWidth && ball.location.y > canvasHeight/2 - goal.y/2 || ball.location.x + ball.r > canvasWidth && ball.location.y < canvasHeight/2 + goal.y/2){
             ball.location.x = canvasWidth - ball.r;
-            scored('Pink');            
+            scored('Pink');
 
     // Check if outside the goal (y check) left-side
     } else if (ball.location.x - ball.r < fieldOffset && ball.location.y < canvasHeight/2 - goal.y/2 || ball.location.x - ball.r < fieldOffset && ball.location.y > canvasHeight/2 + goal.y/2){
