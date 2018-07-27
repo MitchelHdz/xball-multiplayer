@@ -78,7 +78,6 @@ function draw() {
         moveUser();
         userBoundaries();
         drawUser(user);
-
         socket.emit('updateUser', user);
     }
 
@@ -86,6 +85,7 @@ function draw() {
 
     if(ballLoc)
         drawTheBall(ballLoc);
+    loop();
 }
 
 function drawTheBall(_ballLoc) {
@@ -99,16 +99,9 @@ function drawUser(_user){
     console.log(_user);
     img.onload = function () {
       let context = document.getElementById('defaultCanvas0').getContext("2d");
-      context.drawImage(img, _user.x, _user.y);
+      context.drawImage(img, _user.x, _user.y, 100, 100);
     }
     img.src = "../imgs/"+ _user.image.toLowerCase();
-    console.log(img);
-    // Drawing the name;
-    textAlign(CENTER);
-    textSize(14);
-    fill(255);
-    strokeWeight(0);
-    text(_user.name, _user.x, _user.y - userR*1.5);
 
     // if(_user.team === 'Pink'){
     //     fill(pink)
@@ -120,7 +113,7 @@ function drawUser(_user){
     //     stroke(255);
     // } else {
     //     stroke(0);
-    // }
+    // }. 
 
     // strokeWeight(3);
     // ellipse(_user.x, _user.y, userR*2);

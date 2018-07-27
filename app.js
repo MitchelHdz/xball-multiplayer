@@ -82,21 +82,11 @@ io.sockets.on('connection', (socket) => {
     socket.emit('New Player', {teamNames})
     socket.on('Player Register', (player) => {
         console.log('new player: ', player.name);
-        io.to(screen).emit('Player Ready', {name: player.name, image: player.image, team: player.team, id: player.id});
-        createNewUser(player.id, player.name, player.image);
+        io.to(screen).emit('Player Ready', createNewUser(player.id, player.name, player.image, player.team));
     });
-    // socket.on('Selected Player', (player)=>{
-    //     if(onSelectPlayers.length > 0){
-    //         for(let name of onSelectPlayers){
-    //             if(name != player.name)
-    //         }
-    //     }
-    //     else{
-    //         onSelectPlayers.push(player.name);
-    //     }
-    //     console.log(player);
-    //     io.emit('Selected Player', {name: player.name, id: player.id});
-    // });
+    socket.on('Player Kicking', (player) => {
+        console.log('aaaa', player);
+    });
     socket.on('setName', newName => {
         users.forEach(user => {
             if(user.id === socket.id){
@@ -104,7 +94,6 @@ io.sockets.on('connection', (socket) => {
             }
         });
     });
-    
     //Disconnect
     socket.on('disconnect', (data) => {
         connections.splice(connections.indexOf(socket), 1);
@@ -113,12 +102,13 @@ io.sockets.on('connection', (socket) => {
     });
 });
 
-function createNewUser(_id, name, image) {
+function createNewUser(_id, name, image, team) {
     let newUser = {};
     
     newUser.id = _id;
-    newUser.team = getTeam();
+    newUser.team = team;
     newUser.name = name;
+    newUser.image = image;
     
     if(newUser.team === teams[0].name){ // Pink
         newUser.x = (Math.random() * (canvasWidth / 2 - userR)) + fieldOffset + userR;

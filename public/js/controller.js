@@ -42,4 +42,11 @@ $(document).ready(function($) {
 		/* Act on the event */
 		console.log('aaa');
 	});
+	$('.kick-button').on('click', function(event) {
+		event.preventDefault();
+		/* Act on the event */
+		let name = 'Mu';
+		console.log('Pateame esta');
+		socket.emit('Player Kicking', {name});
+	});
 });
