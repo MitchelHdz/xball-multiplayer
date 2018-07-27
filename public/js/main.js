@@ -28,7 +28,12 @@ function configurations(teams){
 }
 $(document).ready(function($) {
     socket.on('Player Ready', (player) => {
-        
+        let playerBox = $('.empty[team="' + player.team + '"]');
+        console.log(playerBox);
+        let playerImage = '/imgs/' + player.image;
+        $(playerBox[0]).find('.player-name').html(player.name);
+        $(playerBox[0]).find('.player-image').attr('src', playerImage);
+        $(playerBox[0]).removeClass('empty');
     });
     $('.popup-send-button').on('click', function(event) {
         event.preventDefault();

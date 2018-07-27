@@ -4,7 +4,9 @@ function newPlayerData(userName){
 }
 $(document).ready(function($) {
 	socket.on('New Player', function(teams){
-        console.log(teams);
+        console.log(teams.teamNames[0]);
+        $('.team.one .team-name').html(teams.teamNames[0]);
+        $('.team.two .team-name').html(teams.teamNames[1]);
     });
 	socket.on('Player Ready', (player)=>{
 
@@ -18,13 +20,19 @@ $(document).ready(function($) {
 		let name = $('.player-info-box.selected').attr('player-name');
 		socket.emit('Selected Player', {name: name, id: socket.id});
 	});
+	$('.team').on('click', function(event) {
+		event.preventDefault();
+		/* Act on the event */
+		$(this).addClass('selected').siblings().removeClass('selected');
+	});
 	$('.player-button').on('click', function(event) {
 		event.preventDefault();
 		/* Act on the event */
 		if($('.player-info-box.selected').length != 0){
 			let name = $('.player-info-box.selected').attr('player-name');
-			let image = $('.player-info-box.selected').attr('player-image')
-			socket.emit('Player Register', {name: name, image: image});
+			let image = $('.player-info-box.selected').attr('player-image');
+			let team = $('.team.selected').attr('team-number');
+			socket.emit('Player Register', {name: name, image: image, team: team});
 		}
 	});
 });

@@ -82,7 +82,7 @@ io.sockets.on('connection', (socket) => {
     socket.emit('New Player', {teamNames})
     socket.on('Player Register', (player) => {
         console.log('new player: ', player.name);
-        io.to(screen).emit('Player Ready', {name: player.name, image: player.image, id: player.id});
+        io.to(screen).emit('Player Ready', {name: player.name, image: player.image, team: player.team, id: player.id});
     });
     // socket.on('Selected Player', (player)=>{
     //     if(onSelectPlayers.length > 0){
