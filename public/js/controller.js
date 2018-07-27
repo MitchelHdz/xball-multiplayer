@@ -1,6 +1,6 @@
 var socket = io.connect();
 var _user;
-var isKicking;
+var isKicking = false;
 var direction;
 function newPlayerData(userName){
 	socket.emit('Player Register', {name: userName});
@@ -34,9 +34,11 @@ $(document).ready(function($) {
 			let name = $('.player-info-box.selected').attr('player-name');
 			let image = $('.player-info-box.selected').attr('player-image');
 			let team = $('.team.selected').attr('team-number');
-			socket.emit('Player Register', {name: name, image: image, team: team});
+			socket.emit('Player Register', {id: _user, name: name, image: image, team: team});
 			$('.background-container').hide();
-			$('.control-container').show();
+			$('.control-container').addClass('active');
+			$('.player-selected-image').attr('src', './imgs/'+ image);
+			$('.player-selected-name').html(name);
 			startGame();
 		}
 	});
@@ -87,6 +89,7 @@ $(document).ready(function($) {
 	function updateUser(){
 		console.log(isKicking);
 		console.log('direction', direction)
-		socket.emit('Update User',{ isKicking: isKicking, direction: direction, playerId: _user});
+		console.log('ID', _user);
+		socket.emit('Update User',{ isKicking: isKicking, direction: direction, id: _user, playerId: _user});
 	}
 });

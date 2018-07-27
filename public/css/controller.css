@@ -157,13 +157,36 @@ h1{
 	align-items: center;
 	background: linear-gradient(45deg, #fc00ff, #00dbde);
 	background-repeat: no-repeat;
-	display: flex;
+	display: none;
 	flex-direction: row;
 	height: 100%;
 	justify-content: space-around;
 	min-height: 100%;
 	padding-bottom: 20px;
 	width: 100%;
+}
+.control-container.active{
+	display: flex;
+}
+.player-selected{
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+.player-selected-image{
+	height: auto;
+	width: 50px;
+}
+.player-selected-name{
+	color: #ffffff;
+	font-family: Apercu-Regular;
+	font-size: 12px;
+	letter-spacing: 0.140em;
+	margin: 0;
+	padding-top: 10px;
+	text-align: center;
+	text-transform: uppercase;
 }
 .joystick-box{
 	align-items: center;

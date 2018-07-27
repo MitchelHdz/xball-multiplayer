@@ -9,10 +9,11 @@ var users = [];
 var user;
 var ballLoc;
 var name = 'Unnamed';
-var speed = 5;
-var userR = 20;
+var speed = 8;
+var userR = 50;
 var ballR = 12;
-
+var goalOne = 0;
+var goalTwo = 0;
 var pink = '#C80064'; //200, 0, 100;
 var teal = '#74C2E1'; //116, 194, 225;
 if (screen.width <= 699) {
@@ -41,6 +42,7 @@ $(document).ready(function($) {
         let size = {width: windowWidth, height: Math.round((windowHeight * 0.8) - 30)}
         gameScreen(teams, size);
         configurations(teams);
+        setInterval(time, 33);
     });
     $('.start-button').on('click', function(e){
       $(this).hide();
@@ -61,10 +63,31 @@ $(document).ready(function($) {
         $('.seconds').html(seconds);
       }, 1000);
     });
+    socket.on('Goal', (team)=>{
+        if(team == 'one'){
+            goalOne ++;
+            $('.score-team.one').html(goalOne);
+        }
+        else if(team == 'two'){
+            goalTwo ++;
+            $('.score-team.two').html(goalTwo);
+        }
+    })
 });
-setInterval(time, 33)
+
 function time(){
-  redraw();
+    drawField();
+
+    if(user){ // To avoid errors on first drawing
+        moveUser(user.direction);
+        userBoundaries();
+        //drawUser(user);
+    }
+
+    drawAllUsersExceptThis();
+
+    if(ballLoc)
+        drawTheBall(ballLoc);
 }
 function preload() {
     socket.on('Player Ready', (player) => {
@@ -73,7 +96,6 @@ function preload() {
         user = player;
     });
     socket.on('tick', function(data) {
-        console.log(data);
         users = data.users;
         ballLoc = data.ballLoc;
     });
@@ -81,7 +103,6 @@ function preload() {
 
 function setup() {
     createCanvas(windowWidth, (windowHeight-200));
-
     // Only start looping when you have the initial data from the server
     noLoop();
 }
@@ -93,7 +114,7 @@ function draw() {
     if(user){ // To avoid errors on first drawing
         moveUser(user.direction);
         userBoundaries();
-        drawUser(user);
+        drawUser();
     }
 
     drawAllUsersExceptThis();
@@ -109,13 +130,16 @@ function drawTheBall(_ballLoc) {
 }
 
 function drawUser(_user){
-    let img = new Image();
-    console.log(_user);
-    img.onload = function () {
-      let context = document.getElementById('defaultCanvas0').getContext("2d");
-      context.drawImage(img, _user.x, _user.y, 100, 100);
-    }
-    img.src = "../imgs/"+ _user.image.toLowerCase();
+    // let img = new Image();
+    // img.onload = function () {
+    //   let context = document.getElementById('defaultCanvas0').getContext("2d");
+    //   context.drawImage(img, _user.x, _user.y, 100, 100);
+    // }
+    // img.src = "../imgs/"+ _user.image.toLowerCase();
+
+    let context = document.getElementById('defaultCanvas0').getContext("2d");
+    let playerImg = document.getElementById(_user.image.replace('.png', '').toLowerCase());
+    context.drawImage(playerImg, _user.x, _user.y, 100, 100);
 
     // if(_user.team === 'Pink'){
     //     fill(pink)
@@ -176,21 +200,6 @@ function moveUser(direction) {
         user.y += speed;
 }
 
-function keyPressed() {
-
-    // 32 is the keyCode for the 'space' button
-    if(keyCode === 32) {
-        user.isKicking = true;
-    }
-}
-
-function keyReleased() {
-
-    // 32 is the keyCode for the 'space' button
-    if(keyCode === 32){
-        user.isKicking = false;
-    }
-}
 
 function drawField() {
     // Draw field margins

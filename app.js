@@ -10,14 +10,14 @@ const User = require('./libs/user');
 const PORT = process.env.PORT || 3000;
 
 let canvasWidth = 100; // Make sure to be same as on client's
-let canvasHeight = 100; // Make sure to be same as on client's
+let canvasHeight = 715; // Make sure to be same as on client's
 let fieldOffset = 30; // Make sure to be same as on client's
-let userR = 20; // Make sure to be same as on client's
+let userR = 50; // Make sure to be same as on client's
 let goal = {
     x: fieldOffset,
     y: 150 // Make sure to be same as on client's goalSize
 }
-let speed = 5;
+let speed = 8;
 let screen;
 let connections = [];
 let users = [];
@@ -68,7 +68,7 @@ io.sockets.on('connection', (socket) => {
     socket.on('Update User', (updatedUser) => {
         users.forEach(user => {
             console.log(updatedUser)
-            if(user.id === updatedUser.player_id){
+            if(user.id === updatedUser.id){
                 if (updatedUser.direction == 'left')
                     user.x -= speed;
 
@@ -82,6 +82,7 @@ io.sockets.on('connection', (socket) => {
                     user.y += speed;
                 user.isKicking = updatedUser.isKicking;
                 user.direction = updatedUser.direction;
+                user.playerId = updatedUser.id;
                 console.log(user);
             }
         })
@@ -98,6 +99,7 @@ io.sockets.on('connection', (socket) => {
     });
     socket.emit('New Player', {teamNames})
     socket.on('Player Register', (player) => {
+        console.log('player--->', player);
         console.log('new player: ', player.name);
         io.to(screen).emit('Player Ready', createNewUser(player.id, player.name, player.image, player.team));
     });
@@ -117,6 +119,7 @@ io.sockets.on('connection', (socket) => {
 });
 
 function createNewUser(_id, name, image, team) {
+    console.log('data-------->', _id, name, image, team);
     let newUser = {};
 
     newUser.id = _id;
@@ -213,6 +216,7 @@ function ballEdges(ball) {
     } else if (ball.location.x + ball.r > canvasWidth && ball.location.y > canvasHeight/2 - goal.y/2 || ball.location.x + ball.r > canvasWidth && ball.location.y < canvasHeight/2 + goal.y/2){
             ball.location.x = canvasWidth - ball.r;
             scored('Pink');
+            io.to(screen).emit('Goal', 'one');
 
     // Check if outside the goal (y check) left-side
     } else if (ball.location.x - ball.r < fieldOffset && ball.location.y < canvasHeight/2 - goal.y/2 || ball.location.x - ball.r < fieldOffset && ball.location.y > canvasHeight/2 + goal.y/2){
@@ -223,6 +227,7 @@ function ballEdges(ball) {
     } else if (ball.location.x - ball.r < 0 && ball.location.y > canvasHeight/2 - goal.y/2 || ball.location.x - ball.r < 0 && ball.location.y < canvasHeight/2 + goal.y/2){
             ball.location.x = ball.r;
             scored('Teal');
+            io.to(screen).emit('Goal', 'two');
     }
 
     if(ball.location.y + ball.r > canvasHeight){
