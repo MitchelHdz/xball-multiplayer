@@ -9,6 +9,7 @@ body, html {
     color: white;
     font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
     height: 100%;
+    position: relative;
 }
 
 body, .popup-container {
@@ -17,6 +18,13 @@ body, .popup-container {
     justify-content: center;
     flex-direction: column;
 }
+
+/* Canvas */
+canvas {
+  position: absolute;
+  top: 0;
+}
+/* End */
 
 h3 {
     font-family: monaco, Consolas, "Lucida Console", monospace;
@@ -34,12 +42,13 @@ p {
 }
 
 .popup-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 3;
+
     background-color: rgba(255, 255, 255, 0.9);
 }
 
@@ -128,7 +137,7 @@ body{
     left: 0;
     right: 0;
     bottom: 0;
-    
+
     background-color: rgba(255, 255, 255, 0.9);
 }
 .popup-settings{
@@ -287,7 +296,7 @@ footer{
     color: #ffffff;
     font-family: Apercu-Regular;
     font-size: 40px;
-    text-shadow: 0px 0px 10px #ffffff; 
+    text-shadow: 0px 0px 10px #ffffff;
 }
 .minutes, .dots, .seconds{
     color: #ffffff;
@@ -303,7 +312,7 @@ footer{
     margin: 0;
     text-align: center;
     text-shadow: 0px 0px 10px #ffffff;
-    text-transform: uppercase; 
+    text-transform: uppercase;
 }
 .game-status-box{
     display: none;
@@ -312,7 +321,7 @@ footer{
     background: -webkit-linear-gradient(45deg, #fc00ff, #00dbde);
     box-shadow: 0px 0px 10px #ffffff;
     left: 50%;
-    margin-left: -200px; 
+    margin-left: -200px;
     padding: 20px 40px;
     position: absolute;
     top: 20px;
