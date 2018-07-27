@@ -83,6 +83,7 @@ io.sockets.on('connection', (socket) => {
     socket.on('Player Register', (player) => {
         console.log('new player: ', player.name);
         io.to(screen).emit('Player Ready', {name: player.name, image: player.image, team: player.team, id: player.id});
+        createNewUser(player.id, player.name, player.image);
     });
     // socket.on('Selected Player', (player)=>{
     //     if(onSelectPlayers.length > 0){
@@ -112,12 +113,12 @@ io.sockets.on('connection', (socket) => {
     });
 });
 
-function createNewUser(_id) {
+function createNewUser(_id, name, image) {
     let newUser = {};
     
     newUser.id = _id;
     newUser.team = getTeam();
-    newUser.name = 'Unnamed';
+    newUser.name = name;
     
     if(newUser.team === teams[0].name){ // Pink
         newUser.x = (Math.random() * (canvasWidth / 2 - userR)) + fieldOffset + userR;

@@ -34,6 +34,7 @@ $(document).ready(function($) {
         $(playerBox[0]).find('.player-name').html(player.name);
         $(playerBox[0]).find('.player-image').attr('src', playerImage);
         $(playerBox[0]).removeClass('empty');
+        drawUser(player);
     });
     $('.popup-send-button').on('click', function(event) {
         event.preventDefault();
@@ -95,17 +96,19 @@ function drawTheBall(_ballLoc) {
 
 function drawUser(_user){
     let img = new Image();
+    console.log(_user);
     img.onload = function () {
-      drawImgae(img, _user.x, _user.y);
+      let context = document.getElementById('defaultCanvas0').getContext("2d");
+      context.drawImage(img, _user.x, _user.y);
     }
-    img.src = "../imgs/"+`${_user.name.toLowecase()}`+".png";
-
+    img.src = "../imgs/"+ _user.image.toLowerCase();
+    console.log(img);
     // Drawing the name;
     textAlign(CENTER);
     textSize(14);
     fill(255);
     strokeWeight(0);
-    text(`${_user.name}`, _user.x, _user.y - userR*1.5);
+    text(_user.name, _user.x, _user.y - userR*1.5);
 
     // if(_user.team === 'Pink'){
     //     fill(pink)

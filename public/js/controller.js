@@ -33,6 +33,13 @@ $(document).ready(function($) {
 			let image = $('.player-info-box.selected').attr('player-image');
 			let team = $('.team.selected').attr('team-number');
 			socket.emit('Player Register', {name: name, image: image, team: team});
+			$('.background-container').hide();
+			$('.control-container').show();
 		}
+	});
+	$('.joystick').on('drag', '.selector', function(event) {
+		event.preventDefault();
+		/* Act on the event */
+		console.log('aaa');
 	});
 });
